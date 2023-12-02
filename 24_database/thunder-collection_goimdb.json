@@ -1,20 +1,20 @@
 {
     "client": "Thunder Client",
     "collectionName": "goimdb",
-    "dateExported": "2023-12-02T13:41:36.364Z",
+    "dateExported": "2023-12-02T16:05:23.195Z",
     "version": "1.1",
     "folders": [],
     "requests": [
         {
-            "_id": "47d36ad3-a102-447b-b401-e6ce42ccb948",
-            "colId": "965efb0b-bac3-4b6c-b762-98571f27e435",
+            "_id": "9c5d1a40-1927-4c6c-9843-005e520b829b",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "GET /movies",
             "url": "http://localhost:2565/movies",
             "method": "GET",
             "sortNum": 10000,
-            "created": "2023-11-30T09:18:47.832Z",
-            "modified": "2023-11-30T09:18:47.832Z",
+            "created": "2023-12-02T13:41:57.628Z",
+            "modified": "2023-12-02T13:41:57.628Z",
             "headers": [
                 {
                     "name": "Content-Type",
@@ -44,15 +44,15 @@
             ]
         },
         {
-            "_id": "666b5b09-3cac-4670-af00-15df01dde0bf",
-            "colId": "965efb0b-bac3-4b6c-b762-98571f27e435",
+            "_id": "f4ff357a-066b-4fac-8b57-07bae9ba0cc0",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "GET /movies?year=2019",
             "url": "http://localhost:2565/movies?year=2019",
             "method": "GET",
             "sortNum": 15000,
-            "created": "2023-11-30T09:18:47.836Z",
-            "modified": "2023-11-30T09:18:47.836Z",
+            "created": "2023-12-02T13:41:57.631Z",
+            "modified": "2023-12-02T13:41:57.631Z",
             "headers": [
                 {
                     "name": "Content-Type",
@@ -94,15 +94,81 @@
             ]
         },
         {
-            "_id": "b246fd88-3724-4478-a39c-897880ebf39a",
-            "colId": "965efb0b-bac3-4b6c-b762-98571f27e435",
+            "_id": "47c8ed54-a761-4bfe-ad0c-f24fb5a1408a",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
+            "containerId": "",
+            "name": "GET /movies?year=2018&title=Avengers: Endgame&rating=7.3&isSuperHero=false",
+            "url": "http://localhost:2565/movies?year=2018&title=Black Panther&isSuperHero=false",
+            "method": "GET",
+            "sortNum": 17500,
+            "created": "2023-12-02T14:28:44.973Z",
+            "modified": "2023-12-02T16:05:16.756Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "year",
+                    "value": "2018",
+                    "isPath": false
+                },
+                {
+                    "name": "title",
+                    "value": "Black Panther",
+                    "isPath": false
+                },
+                {
+                    "name": "rating",
+                    "value": "7.3",
+                    "isDisabled": true,
+                    "isPath": false
+                },
+                {
+                    "name": "isSuperHero",
+                    "value": "false",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "isjson",
+                    "value": ""
+                },
+                {
+                    "type": "Content-Type",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "application/json; charset=UTF-8"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.[0].year",
+                    "action": "equal",
+                    "value": "2018"
+                }
+            ]
+        },
+        {
+            "_id": "3a96da23-fe27-4c48-8144-d17e49d4ffd9",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "GET /movies/:imdbID",
             "url": "http://localhost:2565/movies/tt4154796",
             "method": "GET",
             "sortNum": 20000,
-            "created": "2023-11-30T09:18:47.834Z",
-            "modified": "2023-12-02T13:26:08.785Z",
+            "created": "2023-12-02T13:41:57.629Z",
+            "modified": "2023-12-02T13:41:57.629Z",
             "headers": [
                 {
                     "name": "Content-Type",
@@ -138,15 +204,15 @@
             ]
         },
         {
-            "_id": "839ae616-6161-49af-b3ce-7ebfa8a3b7d7",
-            "colId": "965efb0b-bac3-4b6c-b762-98571f27e435",
+            "_id": "011e00ca-cfe0-4bb5-8f76-acc36fcf1fe4",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "POST /movies",
             "url": "http://localhost:2565/movies",
             "method": "POST",
             "sortNum": 30000,
-            "created": "2023-11-30T09:18:47.835Z",
-            "modified": "2023-12-02T13:29:10.975Z",
+            "created": "2023-12-02T13:41:57.630Z",
+            "modified": "2023-12-02T13:41:57.630Z",
             "headers": [
                 {
                     "name": "Content-Type",
@@ -181,15 +247,15 @@
             ]
         },
         {
-            "_id": "456118da-cc6e-47c1-bb0a-5ebf441ccb70",
-            "colId": "965efb0b-bac3-4b6c-b762-98571f27e435",
+            "_id": "55d0c542-e4b0-46d4-909e-32b5fbbb4b25",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "PUT /movies/:imdbID",
             "url": "http://localhost:2565/movies/tt4154757",
             "method": "PUT",
             "sortNum": 40000,
-            "created": "2023-11-30T09:18:47.837Z",
-            "modified": "2023-12-02T13:39:02.366Z",
+            "created": "2023-12-02T13:41:57.633Z",
+            "modified": "2023-12-02T13:41:57.633Z",
             "headers": [
                 {
                     "name": "Content-Type",
@@ -230,15 +296,15 @@
             ]
         },
         {
-            "_id": "4b0ed5fd-16f8-4450-a357-dfff53236ede",
-            "colId": "965efb0b-bac3-4b6c-b762-98571f27e435",
+            "_id": "f17a62b4-6f61-4971-81cb-7782f32cf5c5",
+            "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "DELETE / movies/:imdbID",
             "url": "http://localhost:2565/movies/tt4154757",
             "method": "DELETE",
             "sortNum": 50000,
-            "created": "2023-12-02T13:33:03.282Z",
-            "modified": "2023-12-02T13:39:15.222Z",
+            "created": "2023-12-02T13:41:57.634Z",
+            "modified": "2023-12-02T13:41:57.634Z",
             "headers": [],
             "params": [],
             "tests": [
