@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "goimdb",
-    "dateExported": "2023-12-02T16:05:23.195Z",
+    "dateExported": "2023-12-02T16:55:23.540Z",
     "version": "1.1",
     "folders": [],
     "requests": [
@@ -98,11 +98,11 @@
             "colId": "11397310-4fcb-4e7d-8c7c-dfa7fe652e8a",
             "containerId": "",
             "name": "GET /movies?year=2018&title=Avengers: Endgame&rating=7.3&isSuperHero=false",
-            "url": "http://localhost:2565/movies?year=2018&title=Black Panther&isSuperHero=false",
+            "url": "http://localhost:2565/movies/tt1825683?rating=7.3&year=2018&title=Black Panther&isSuperHero=false",
             "method": "GET",
             "sortNum": 17500,
             "created": "2023-12-02T14:28:44.973Z",
-            "modified": "2023-12-02T16:05:16.756Z",
+            "modified": "2023-12-02T16:54:52.062Z",
             "headers": [
                 {
                     "name": "Content-Type",
@@ -111,6 +111,11 @@
             ],
             "params": [
                 {
+                    "name": "rating",
+                    "value": "7.3",
+                    "isPath": false
+                },
+                {
                     "name": "year",
                     "value": "2018",
                     "isPath": false
@@ -118,12 +123,6 @@
                 {
                     "name": "title",
                     "value": "Black Panther",
-                    "isPath": false
-                },
-                {
-                    "name": "rating",
-                    "value": "7.3",
-                    "isDisabled": true,
                     "isPath": false
                 },
                 {
@@ -153,7 +152,7 @@
                 },
                 {
                     "type": "json-query",
-                    "custom": "json.[0].year",
+                    "custom": "json.year",
                     "action": "equal",
                     "value": "2018"
                 }

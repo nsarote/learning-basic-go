@@ -7,9 +7,11 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	_ "github.com/proullon/ramsql/driver"
 	_ "github.com/lib/pq"
+	_ "github.com/proullon/ramsql/driver"
+
 	//"strconv"
+	"math"
 )
 
 type DBType int32
@@ -132,11 +134,10 @@ const (
 )
 
 func connPostgres() {
-	fmt.Println("POSTGRES_DB")
 	var err error
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		fmt.Println(err)
 		log.Fatal(err)
@@ -150,7 +151,6 @@ func connPostgres() {
 }
 
 func connMemDB() {
-	fmt.Println("MEM_DB")
 	var err error
 	db, err = sql.Open("ramsql", "goimdb")
 	if err != nil {
@@ -166,7 +166,6 @@ func connMemDB() {
 }
 
 func createTableMemDB() {
-	fmt.Println("MEM_DB")
 	var err error
 	createTb := `
 	CREATE TABLE IF NOT EXISTS goimdb (
@@ -201,15 +200,24 @@ func createTablePostgres() {
 		isSuperHero BOOLEAN NOT NULL
 	);
 	`
-	fmt.Println("POSTGRES_DB 1",db)
 	_, err = db.Exec(createTb)
-	fmt.Println("POSTGRES_DB 2")
 	if err != nil {
 		fmt.Println("create table error:", err)
 		return
 	}
 
 	fmt.Println("table created.")
+}
+
+func dropTablePostgres() {
+	var err error
+	dropTb := `DROP TABLE IF EXISTS goimdb;`
+	_, err = db.Exec(dropTb)
+	if err != nil {
+		fmt.Println("drop table error:", err)
+	}
+
+	fmt.Println("drop table success.")
 }
 
 func insertMovie(m Movie) (int64, error) {
@@ -232,25 +240,35 @@ func insertDatas() {
 	fmt.Println("insertDatas totalRecord :", totalRecord)
 }
 
+func round(val float32, precision int) float32 {
+	return float32(math.Round(float64(val)*(math.Pow10(precision))) / math.Pow10(precision))
+}
+
 func insertData(imdbID, title string, year int, ratings float32, isSuperHero bool) (int64, error) {
-	insert := `
-	INSERT INTO goimdb(imdbID,title,year,rating,isSuperHero)
-	VALUES (?,?,?,?,?);
-	`
+	var insert string
+	switch currentDBType {
+	case MEM_DB:
+		insert = `INSERT INTO goimdb(imdbid , title , year , rating, issuperhero) VALUES ($1 , $2 , $3 , $4 , $5 );`
+	case POSTGRES_DB:
+		insert = `INSERT INTO goimdb(imdbid , title , year , rating, issuperhero) VALUES ($1 , $2 , $3 , ROUND($4,1) , $5 );`
+	}
 	stmt, err := db.Prepare(insert)
 	if err != nil {
 		fmt.Println("prepare statement error:", err)
+		log.Fatal("prepare statement error:", err)
 		return 0, err
 	}
-	r, err := stmt.Exec(imdbID, title, year, ratings, isSuperHero)
+	r, err := stmt.Exec(imdbID, title, year, round(ratings, 1), isSuperHero)
 	if err != nil {
 		fmt.Println("insert error:", err)
+		log.Fatal("insert error:", err)
 		return 0, err
 	}
 	l, err := r.LastInsertId()
 	fmt.Println("lastINsertId", l, "err:", err)
 	ef, err := r.RowsAffected()
 	fmt.Printf("RowsAffecred %d err: %s\n", ef, err)
+
 	return ef, nil
 }
 
@@ -341,7 +359,7 @@ func deleteMovieByImdbID(imdbID string) (int64, error) {
 }
 
 func getMovieByImdbID(idForFind string) (Movie, error) {
-	rowx := db.QueryRow(`SELECT id, imdbID, title, year, rating, isSuperHero FROM goimdb WHERE imdbID=?`, idForFind)
+	rowx := db.QueryRow(`SELECT id, imdbID, title, year, rating, isSuperHero FROM goimdb WHERE imdbID=$1`, idForFind)
 	var id int64
 	var imdbID, title string
 	var year int
@@ -367,7 +385,9 @@ func getMovieByImdbID(idForFind string) (Movie, error) {
 
 // end connect database
 
-const currentDBType = POSTGRES_DB
+const currentDBType = MEM_DB
+
+//const currentDBType = MEM_DB
 
 func main() {
 	defer db.Close()
@@ -379,6 +399,7 @@ func main() {
 	case POSTGRES_DB:
 		fmt.Println("POSTGRES_DB")
 		connPostgres()
+		dropTablePostgres()
 		createTablePostgres()
 	default:
 		fmt.Println("MEM_DB")
