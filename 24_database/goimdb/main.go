@@ -6,10 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"strconv"
-
 	"github.com/labstack/echo/v4"
 	_ "github.com/proullon/ramsql/driver"
+	//"strconv"
 )
 
 type Movie struct {
@@ -22,25 +21,17 @@ type Movie struct {
 }
 
 func getAllMovieHandler(c echo.Context) error {
-	//title := c.QueryParam("title")
-	y := c.QueryParam("year")
-	//rating := c.QueryParam("rating")
-	//isSuperHero := c.QueryParam("isSuperHero")
-	if y == "" {
-		return c.JSON(http.StatusOK, getAllMovie())
+	title := c.QueryParam("title")
+	year := c.QueryParam("year")
+	rating := c.QueryParam("rating")
+	isSuperHero := c.QueryParam("isSuperHero")
+	mList, err := getAllMovie(title, year, rating, isSuperHero)
+	switch err {
+	case nil:
+		return c.JSON(http.StatusOK, mList)
+	default:
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal Server Error:" + err.Error()})
 	}
-	year, err := strconv.Atoi(y)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-	ms := []Movie{}
-	for _, movie := range getAllMovie() {
-		if movie.Year == int(year) {
-			ms = append(ms, movie)
-		}
-	}
-	return c.JSON(http.StatusOK, ms)
-
 }
 
 func getMovieByIdHandler(c echo.Context) error {
@@ -153,7 +144,7 @@ func createTable() {
 
 	_, err = db.Exec(createTb)
 	if err != nil {
-		log.Fatal("create table error:", err)
+		fmt.Println("create table error:", err)
 		return
 	}
 
@@ -202,13 +193,27 @@ func insertData(imdbID, title string, year int, ratings float32, isSuperHero boo
 	return ef, nil
 }
 
-func getAllMovie() []Movie {
-	rows, err := db.Query(`
-	SELECT id, imdbID, title, year, rating, isSuperHero
-	FROM goimdb
-	`)
+func getAllMovie(title, year, rating, isSuperHero string) ([]Movie, error) {
+	var query = "SELECT id, imdbID, title, year, rating, isSuperHero FROM goimdb where 1=1 "
+	if title != "" {
+		//query += "and UPPER(title) like '%" + strings.ToUpper(title) + "%' "
+		query += "and title = '" + title + "' "
+	}
+	if year != "" {
+		query += "and year = " + year + " "
+	}
+	if rating != "" {
+		//f, _ := strconv.ParseFloat(rating, 64)
+		query += "and rating = " + rating + " "
+	}
+	if isSuperHero != "" {
+		query += "and issuperhero = '" + isSuperHero + "' "
+	}
+	fmt.Println("query:", query)
+	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal("query error", err)
+		fmt.Println("query error", err)
+		return nil, err
 	}
 
 	ms := []Movie{}
@@ -221,7 +226,8 @@ func getAllMovie() []Movie {
 
 		err := rows.Scan(&id, &imdbID, &title, &year, &rating, &isSuperHero)
 		if err != nil {
-			log.Fatal("for rows error", err)
+			fmt.Println("for rows error", err)
+			return nil, err
 		}
 		//fmt.Println("row:", id, imdbID, title, year, rating, isSuperHero)
 		movie := &Movie{
@@ -234,7 +240,7 @@ func getAllMovie() []Movie {
 		}
 		ms = append(ms, *movie)
 	}
-	return ms
+	return ms, nil
 }
 
 func updateData(imdbIDForUpdate, title string, year int, ratings float32, isSuperHero bool) error {
