@@ -8,7 +8,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/proullon/ramsql/driver"
+	_ "github.com/lib/pq"
 	//"strconv"
+)
+
+type DBType int32
+
+const (
+	MEM_DB DBType = iota
+	POSTGRES_DB
 )
 
 type Movie struct {
@@ -115,20 +123,50 @@ func deleteMovieHandler(c echo.Context) error {
 
 var db *sql.DB
 
-func conn() {
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "admin"
+	dbname   = "goimdb"
+)
+
+func connPostgres() {
+	fmt.Println("POSTGRES_DB")
 	var err error
-	db, err = sql.Open("ramsql", "goimdb")
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
 	err = db.Ping()
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
 	fmt.Println("Connect database success")
 }
 
-func createTable() {
+func connMemDB() {
+	fmt.Println("MEM_DB")
+	var err error
+	db, err = sql.Open("ramsql", "goimdb")
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal(err)
+	}
+	fmt.Println("Connect database success")
+}
+
+func createTableMemDB() {
+	fmt.Println("MEM_DB")
 	var err error
 	createTb := `
 	CREATE TABLE IF NOT EXISTS goimdb (
@@ -141,8 +179,31 @@ func createTable() {
 	PRIMARY KEY (id)
 	);
 	`
-
 	_, err = db.Exec(createTb)
+	if err != nil {
+		fmt.Println("create table error:", err)
+		return
+	}
+
+	fmt.Println("table created.")
+}
+
+func createTablePostgres() {
+	fmt.Println("POSTGRES_DB")
+	var err error
+	createTb := `
+	CREATE TABLE IF NOT EXISTS goimdb (
+		id SERIAL PRIMARY KEY,
+		imdbID TEXT NOT NULL UNIQUE,
+		title TEXT NOT NULL,
+		year INT NOT NULL,
+		rating FLOAT NOT NULL,
+		isSuperHero BOOLEAN NOT NULL
+	);
+	`
+	fmt.Println("POSTGRES_DB 1",db)
+	_, err = db.Exec(createTb)
+	fmt.Println("POSTGRES_DB 2")
 	if err != nil {
 		fmt.Println("create table error:", err)
 		return
@@ -306,9 +367,25 @@ func getMovieByImdbID(idForFind string) (Movie, error) {
 
 // end connect database
 
+const currentDBType = POSTGRES_DB
+
 func main() {
-	conn()
-	createTable()
+	defer db.Close()
+	switch currentDBType {
+	case MEM_DB:
+		fmt.Println("MEM_DB")
+		connMemDB()
+		createTableMemDB()
+	case POSTGRES_DB:
+		fmt.Println("POSTGRES_DB")
+		connPostgres()
+		createTablePostgres()
+	default:
+		fmt.Println("MEM_DB")
+		connMemDB()
+		createTableMemDB()
+	}
+
 	insertDatas()
 
 	e := echo.New()
